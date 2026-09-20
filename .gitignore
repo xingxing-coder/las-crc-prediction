@@ -1,0 +1,33 @@
+# --- Data: TCGA/GDSC/CTRP data must never be committed (see README) ---
+data/raw/*
+data/processed/*
+results/figures/*
+results/tables/*
+results/models/
+
+# ... but keep the directory placeholders so the structure survives cloning
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!results/figures/.gitkeep
+!results/tables/.gitkeep
+
+# Raw/processed data files anywhere else
+*.rds
+*.RDS
+data/**/*.csv
+data/**/*.tsv
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp

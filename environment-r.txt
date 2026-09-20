@@ -1,0 +1,19 @@
+# R dependencies for las-crc-prediction (scripts in R/)
+#
+# Install from Bioconductor (R >= 4.3 recommended):
+#   if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+#   BiocManager::install(c("TCGAbiolinks", "GSVA", "edgeR",
+#                          "SummarizedExperiment", "GSEABase"))
+#
+# Install from CRAN:
+#   install.packages(c("tidyverse", "data.table"))
+#
+# Package list:
+#   TCGAbiolinks          - TCGA data download from GDC (R/01)
+#   GSVA (>= 1.50)        - ssGSEA scoring, new *Param() API (R/03)
+#   GSEABase              - GMT file parsing (R/03)
+#   edgeR                 - log2-CPM normalisation (R/02)
+#   SummarizedExperiment  - TCGA expression container handling (R/01, R/02)
+#   tidyverse             - general data wrangling
+#   data.table            - fast CSV I/O and table joins (R/02, R/03)
