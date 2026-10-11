@@ -16,7 +16,7 @@ drug-sensitivity resources.
 
 ```
  TCGA-COAD/READ            QC + inclusion flow          LAS scoring
- (GDC, STAR-Counts)  --->  (edgeR log2-CPM, ~620)  ---> (ssGSEA on LRG set)
+ (GDC, STAR-Counts)  --->  (edgeR log2-CPM, n=600)  ---> (ssGSEA on LRG set)
         R/01                    R/02                        R/03
                                                               |
                                                               v
@@ -74,11 +74,40 @@ the lactylation-related-gene framework popularised in recent literature
 expanded to the full literature-derived set (e.g. the 332-gene compendium)
 before formal analysis.
 
+## Preliminary results (GDC download: October 2026; exact freeze in `data/raw/download_log.txt`)
+
+Cohort inclusion flow (TCGA-COAD/READ, STAR-Counts):
+
+| Step | n |
+|------|---|
+| RNA-seq samples (tumour + adjacent normal) | 701 |
+| Primary tumour only (barcode positions 14-15 == "01") | 647 |
+| Deduplicated patients (one aliquot per patient) | 624 |
+| Complete TNM stage + survival data (modeling cohort) | **600** |
+
+Construct validity of LAS (Spearman correlation with LAS, N = 600):
+
+| Gene | rho | p value | Interpretation |
+|------|-----|---------|----------------|
+| ALDOA | 0.66 | 3.3e-75 | Glycolytic flux (lactate substrate supply) |
+| ENO1 | 0.47 | 1.8e-34 | Glycolytic flux |
+| PFKP | 0.47 | 1.1e-33 | Glycolytic flux |
+| PFKM | 0.18 | 1.1e-05 | Glycolytic flux |
+| EP300 | -0.31 | 6.8e-15 | Lactylation writer (mRNA level) |
+
+LAS correlates strongly with the glycolytic / lactate-supply transcriptional
+programme but not with EP300 mRNA abundance. This is consistent with LAS
+capturing substrate-driven lactylation-associated transcription rather than
+writer expression — enzymatic lactyltransferase activity is not reflected by
+EP300 mRNA levels — and reinforces that LAS must be interpreted as a
+transcriptional proxy (see Methodological note).
+
 ## Status
 
 Work in progress. Completed: TCGA-COAD/READ download, preprocessing and QC
-pipeline, ssGSEA LAS scoring scaffold. In progress: model tuning, SHAP
-interpretation, GDSC/CTRP drug-sensitivity mapping.
+pipeline, ssGSEA LAS scoring with construct-validity checks (n = 600). In
+progress: model tuning, SHAP interpretation, GDSC/CTRP drug-sensitivity
+mapping.
 
 ## Contact
 

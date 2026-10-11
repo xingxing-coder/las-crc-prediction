@@ -99,16 +99,34 @@ os_time <- ifelse(!is.na(clin$days_to_death),
                   clin$days_to_last_follow_up)
 clin[, os_time := as.numeric(os_time)]
 
-# TNM stage: prefer the harmonised FIGO/AJCC stage, fall back to ajcc field.
-stage_col <- intersect(c("ajcc_pathologic_stage", "figo_stage"), names(clin))[1]
-clin[, tnm_stage := get(stage_col)]
+# TNM stage / gender / age harmonisation across TCGAbiolinks versions.
+# Column names in GDCquery_clinic() output vary between TCGAbiolinks
+# releases, so resolve columns from a candidate list and fall back to NA
+# with a warning (instead of crashing) when a column is absent.
+pick_col <- function(dt, candidates, label) {
+  hit <- intersect(candidates, names(dt))[1]
+  if (is.na(hit)) {
+    hit <- grep(paste0("^(", paste(candidates, collapse = "|"), ")$"),
+                names(dt), ignore.case = TRUE, value = TRUE)[1]
+  }
+  if (is.na(hit)) {
+    message("[02] WARNING: no ", label, " column found; set to NA. ",
+            "Available columns: ", paste(names(dt), collapse = ", "))
+    return(NA_character_)
+  }
+  hit
+}
 
-# Gender / age harmonisation across TCGAbiolinks versions.
-gender_col <- intersect(c("gender"), names(clin))[1]
-age_col    <- intersect(c("age_at_diagnosis", "age_at_index"), names(clin))[1]
-clin[, gender := get(gender_col)]
-clin[, age := as.numeric(get(age_col))]
-if (max(clin$age, na.rm = TRUE) > 150) clin[, age := age / 365.25]  # days -> years
+stage_col  <- pick_col(clin, c("ajcc_pathologic_stage", "figo_stage"),
+                       "TNM stage")
+gender_col <- pick_col(clin, c("gender", "sex_at_birth", "sex"), "gender")
+age_col    <- pick_col(clin, c("age_at_diagnosis", "age_at_index"), "age")
+
+clin[, tnm_stage := if (is.na(stage_col))  NA_character_ else get(stage_col)]
+clin[, gender    := if (is.na(gender_col)) NA_character_ else get(gender_col)]
+clin[, age       := if (is.na(age_col))    NA_real_      else as.numeric(get(age_col))]
+if (!all(is.na(clin$age)) && max(clin$age, na.rm = TRUE) > 150)
+  clin[, age := age / 365.25]  # days -> years
 
 # MSI status ---------------------------------------------------------------
 # TODO(msi): The default GDCquery_clinic(type = "clinical") table has no MSI

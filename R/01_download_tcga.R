@@ -77,7 +77,13 @@ clinical_list <- lapply(projects, function(p) {
   clin$project_id <- p
   clin
 })
-clinical <- do.call(rbind, clinical_list)
+
+# NOTE: GDCquery_clinic returns tables whose columns differ between projects
+# (e.g. COAD vs READ), so a plain rbind() fails with "variables' column
+# number mismatch". rbindlist(fill = TRUE) binds rows by column *name* and
+# pads missing columns with NA. data.table is a TCGAbiolinks dependency.
+clinical <- data.table::rbindlist(clinical_list, fill = TRUE)
+clinical <- as.data.frame(clinical)
 
 saveRDS(clinical, clin_out)
 message("[01] Saved clinical data -> ", clin_out,
